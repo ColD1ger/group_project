@@ -5,26 +5,28 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:network_image_mock/network_image_mock.dart';
 
 import 'package:group_project/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('tapping a film opens its details and trailer page',
+      (WidgetTester tester) async {
+    await mockNetworkImagesFor(() async {
+      await tester.pumpWidget(const MyApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+      final filmTitle = find.text('Interstellar').first;
+      await tester.ensureVisible(filmTitle);
+      await tester.pumpAndSettle();
+      await tester.tap(filmTitle);
+      await tester.pumpAndSettle();
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+      expect(find.text('About this film'), findsOneWidget);
+      expect(find.textContaining('wormhole'), findsOneWidget);
+      expect(find.text('Cast'), findsOneWidget);
+      expect(find.text('Matthew McConaughey'), findsOneWidget);
+      expect(find.text('Watch trailer on YouTube'), findsOneWidget);
+    });
   });
 }

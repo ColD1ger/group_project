@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'film_videos_info.dart';
 import 'for_listview/images_and_info.dart';
 
 class MainPage extends StatefulWidget {
@@ -170,7 +171,13 @@ class _MainPageState extends State<MainPage> {
                         final isLiked = favoriteFilms.contains(movie['title']);
 
                         return GestureDetector(
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) => FilmsVideos(film: movie),
+                              ),
+                            );
+                          },
                           child: Container(
                             decoration: BoxDecoration(
                               color: const Color(0xFF1E293B),
