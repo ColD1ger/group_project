@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../for_listview/images_and_info.dart';
+
 class FilmsVideos extends StatelessWidget {
   const FilmsVideos({super.key, required this.film});
 
-  final Map<String, dynamic> film;
+  final Film film;
 
   Future<void> _openTrailer(BuildContext context) async {
-    final title = film['title']?.toString() ?? '';
+    final title = film.title;
     final trailerUri = Uri.https('www.youtube.com', '/results', {
       'search_query': '$title official trailer',
     });
@@ -18,24 +20,37 @@ class FilmsVideos extends StatelessWidget {
 
     if (!didLaunch && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not open the trailer.')),
+        const SnackBar(content: Text('Չհաջողվեց բացել թրեյլերը։')),
+      );
+    }
+  }
+
+  Future<void> _openMovie(BuildContext context) async {
+    final title = film.title;
+    final filmUri = Uri.https('kinogo.ec', '/results', {
+      'search_query': '$title official movie',
+    });
+    final didLaunch = await launchUrl(
+      filmUri,
+      mode: LaunchMode.externalApplication,
+    );
+
+    if (!didLaunch && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Չհաջողվեց բացել ֆիլմը։')),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final title = film['title']?.toString() ?? 'Film';
-    final category = film['category']?.toString() ?? '';
-    final rating = film['rating']?.toString() ?? '';
-    final description = film['description']?.toString() ?? '';
-    final cast = (film['cast'] as List<dynamic>? ?? const [])
-        .map((actor) => actor.toString())
-        .toList();
-    final imageUrl = film['image']?.toString() ?? '';
-    final color = film['color'] is Color
-        ? film['color'] as Color
-        : const Color(0xFF1E293B);
+    final title = film.title;
+    final category = film.category;
+    final rating = film.rating;
+    final description = film.description;
+    final cast = film.cast;
+    final imageUrl = film.image;
+    final color = film.color;
 
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
@@ -48,20 +63,23 @@ class FilmsVideos extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              width: double.infinity,
-              height: 320,
-              child: Image.network(
-                imageUrl,
-                semanticLabel: title,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => ColoredBox(
-                  color: color,
-                  child: const Center(
-                    child: Icon(
-                      Icons.movie_outlined,
-                      color: Colors.white54,
-                      size: 72,
+            GestureDetector(
+              onTap: () => _openTrailer(context),
+              child: SizedBox(
+                width: double.infinity,
+                height: 320,
+                child: Image.network(
+                  imageUrl,
+                  semanticLabel: title,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => ColoredBox(
+                    color: color,
+                    child: const Center(
+                      child: Icon(
+                        Icons.movie_outlined,
+                        color: Colors.white54,
+                        size: 72,
+                      ),
                     ),
                   ),
                 ),
@@ -109,7 +127,7 @@ class FilmsVideos extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
                   const Text(
-                    'About this film',
+                    'Ֆիլմի մասին',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -119,7 +137,7 @@ class FilmsVideos extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     description.isEmpty
-                        ? '$title is a ${category.toLowerCase()} film.'
+                        ? '$title-ը ${category.toLowerCase()} ժանրի ֆիլմ է։'
                         : description,
                     style: const TextStyle(
                       color: Colors.white70,
@@ -129,7 +147,7 @@ class FilmsVideos extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
                   const Text(
-                    'Cast',
+                    'Դերասանական կազմ',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -139,7 +157,7 @@ class FilmsVideos extends StatelessWidget {
                   const SizedBox(height: 12),
                   if (cast.isEmpty)
                     const Text(
-                      'Cast information is unavailable.',
+                      'Դերասանական կազմի մասին տեղեկություն չկա։',
                       style: TextStyle(color: Colors.white70),
                     )
                   else
@@ -170,11 +188,26 @@ class FilmsVideos extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton.icon(
-                      onPressed: () => _openTrailer(context),
+                      onPressed: () => _openMovie(context),
                       icon: const Icon(Icons.play_arrow),
-                      label: const Text('Watch trailer on YouTube'),
+                      label: Text('Դիտել «$title» ֆիլմը'),
                       style: FilledButton.styleFrom(
                         backgroundColor: const Color(0xFF7C3AED),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      onPressed: () {},
+                      label: const Text('+ Ցուցակ'),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(255, 47, 34, 70),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),

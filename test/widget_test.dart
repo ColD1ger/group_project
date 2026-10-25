@@ -11,6 +11,51 @@ import 'package:network_image_mock/network_image_mock.dart';
 import 'package:group_project/main.dart';
 
 void main() {
+  testWidgets('animation category filters the film list',
+      (WidgetTester tester) async {
+    await mockNetworkImagesFor(() async {
+      await tester.pumpWidget(const MyApp());
+
+      await tester.tap(find.text('Անիմացիա'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('4 ֆիլմ'), findsOneWidget);
+      expect(find.text('Spirited Away'), findsOneWidget);
+      expect(find.text('Coco'), findsOneWidget);
+      expect(find.text('Interstellar'), findsNothing);
+    });
+  });
+
+  testWidgets('bottom navigation switches between films and favorites',
+      (WidgetTester tester) async {
+    await mockNetworkImagesFor(() async {
+      await tester.pumpWidget(const MyApp());
+
+      expect(find.text('Interstellar'), findsOneWidget);
+      await tester.tap(find.text('Սիրվածներ'));
+      await tester.pumpAndSettle();
+      expect(find.text('Ֆիլմեր չեն գտնվել'), findsOneWidget);
+
+      await tester.tap(find.text('Գլխավոր'));
+      await tester.pumpAndSettle();
+      expect(find.text('Interstellar'), findsOneWidget);
+    });
+  });
+
+  testWidgets('profile navigation opens the profile page',
+      (WidgetTester tester) async {
+    await mockNetworkImagesFor(() async {
+      await tester.pumpWidget(const MyApp());
+
+      await tester.tap(find.text('Պրոֆիլ'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Իմ պրոֆիլը'), findsWidgets);
+      expect(find.text('Ֆիլմասեր'), findsOneWidget);
+      expect(find.text('Սիրվածներ'), findsWidgets);
+    });
+  });
+
   testWidgets('tapping a film opens its details and trailer page',
       (WidgetTester tester) async {
     await mockNetworkImagesFor(() async {
@@ -22,11 +67,11 @@ void main() {
       await tester.tap(filmTitle);
       await tester.pumpAndSettle();
 
-      expect(find.text('About this film'), findsOneWidget);
-      expect(find.textContaining('wormhole'), findsOneWidget);
-      expect(find.text('Cast'), findsOneWidget);
+      expect(find.text('Ֆիլմի մասին'), findsOneWidget);
+      expect(find.textContaining('որդնանցքով'), findsOneWidget);
+      expect(find.text('Դերասանական կազմ'), findsOneWidget);
       expect(find.text('Matthew McConaughey'), findsOneWidget);
-      expect(find.text('Watch trailer on YouTube'), findsOneWidget);
+      expect(find.text('Դիտել «Interstellar» ֆիլմը'), findsOneWidget);
     });
   });
 }
