@@ -71,7 +71,26 @@ void main() {
       expect(find.textContaining('որդնանցքով'), findsOneWidget);
       expect(find.text('Դերասանական կազմ'), findsOneWidget);
       expect(find.text('Matthew McConaughey'), findsOneWidget);
-      expect(find.text('Դիտել «Interstellar» ֆիլմը'), findsOneWidget);
+      expect(find.text('+ Ցուցակ'), findsOneWidget);
+      expect(find.text('Դիտել ֆիլմը'), findsOneWidget);
+
+      await tester.ensureVisible(find.text('+ Ցուցակ'));
+      await tester.tap(find.text('+ Ցուցակ'));
+      await tester.pumpAndSettle();
+      expect(find.text('Ցուցակում է'), findsOneWidget);
+
+      await tester.ensureVisible(find.text('Դիտել ֆիլմը'));
+      await tester.tap(find.text('Դիտել ֆիլմը'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('ֆիլմի համար'), findsOneWidget);
+
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Սիրվածներ'));
+      await tester.pumpAndSettle();
+      expect(find.text('Interstellar'), findsOneWidget);
     });
   });
 }

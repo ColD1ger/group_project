@@ -216,7 +216,19 @@ class _MainPageState extends State<MainPage> {
                                 onTap: () {
                                   Navigator.of(context).push(
                                     MaterialPageRoute<void>(
-                                      builder: (_) => FilmsVideos(film: movie),
+                                      builder: (_) => FilmsVideos(
+                                        film: movie,
+                                        isFavorite: isLiked,
+                                        onFavoriteChanged: (isFavorite) {
+                                          setState(() {
+                                            if (isFavorite) {
+                                              favoriteFilms.add(movie.title);
+                                            } else {
+                                              favoriteFilms.remove(movie.title);
+                                            }
+                                          });
+                                        },
+                                      ),
                                     ),
                                   );
                                 },
@@ -264,41 +276,6 @@ class _MainPageState extends State<MainPage> {
                                                     colors: [
                                                       Colors.black,
                                                       Colors.transparent,
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                              Positioned(
-                                                top: 8,
-                                                left: 8,
-                                                child: Container(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 6,
-                                                      vertical: 4),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.black,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8),
-                                                  ),
-                                                  child: Row(
-                                                    children: [
-                                                      const Icon(
-                                                        Icons.star,
-                                                        color: Colors.amber,
-                                                        size: 14,
-                                                      ),
-                                                      const SizedBox(width: 4),
-                                                      Text(
-                                                        movie.rating,
-                                                        style: const TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 12,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
-                                                      ),
                                                     ],
                                                   ),
                                                 ),

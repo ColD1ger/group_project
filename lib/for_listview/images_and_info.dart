@@ -4,27 +4,30 @@ class Film {
   const Film({
     required this.title,
     required this.category,
-    required this.rating,
     required this.description,
     required this.cast,
     required this.image,
+    this.trailerUrl,
+    this.movieUrl,
     this.color = const Color(0xFF1E293B),
   });
 
   final String title;
   final String category;
-  final String rating;
   final String description;
   final List<String> cast;
   final String image;
+  final String? trailerUrl;
+  final String? movieUrl;
   final Color color;
 }
 
 final List<Film> filmsData = [
   const Film(
     title: 'Interstellar',
+    trailerUrl: 'https://www.youtube.com/watch?v=zSWdZVtXT7E',
+    movieUrl: 'https://kinogo.biz',
     category: 'Գիտաֆանտաստիկ • 2014',
-    rating: '4.9',
     description:
         'Նախկին օդաչուն միանում է վտանգավոր առաքելության՝ որդնանցքով մարդկության համար նոր տուն գտնելու նպատակով։',
     cast: ['Matthew McConaughey', 'Anne Hathaway', 'Jessica Chastain'],
@@ -34,8 +37,9 @@ final List<Film> filmsData = [
   ),
   const Film(
     title: 'Inception',
+    trailerUrl: 'https://www.youtube.com/watch?v=YoHD9XEInc0',
+    movieUrl: 'https://kinogo.biz',
     category: 'Գիտաֆանտաստիկ • 2010',
-    rating: '4.8',
     description:
         'Հմուտ գողը ներխուժում է մարդկանց երազներ՝ գաղտնիքներ գողանալու համար, ապա ստանձնում անհնարին մի գործ՝ գաղափար ներշնչել։',
     cast: ['Leonardo DiCaprio', 'Joseph Gordon-Levitt', 'Elliot Page'],
@@ -45,8 +49,9 @@ final List<Film> filmsData = [
   ),
   const Film(
     title: 'The Matrix',
+    trailerUrl: 'https://www.youtube.com/watch?v=vKQi3bBA1y8',
+    movieUrl: 'https://kinogo.biz',
     category: 'Գիտաֆանտաստիկ • 1999',
-    rating: '4.7',
     description:
         'Համակարգչահենը բացահայտում է, որ իր ճանաչած աշխարհը նմանակված իրականություն է, և միանում է մարդկությունն ազատագրելու պայքարին։',
     cast: ['Keanu Reeves', 'Laurence Fishburne', 'Carrie-Anne Moss'],
@@ -56,8 +61,9 @@ final List<Film> filmsData = [
   ),
   const Film(
     title: 'Avatar: The Way of Water',
+    trailerUrl: 'https://www.youtube.com/watch?v=d9MyW72ELq0',
+    movieUrl: 'https://kinogo.biz',
     category: 'Գիտաֆանտաստիկ • 2022',
-    rating: '9.3',
     description:
         'Երբ Պանդորա է հասնում նոր սպառնալիք, Ջեյք Սալլին և Նեյթիրին պաշտպանում են իրենց ընտանիքն ու օվկիանոսի ցեղերին։',
     cast: ['Sam Worthington', 'Zoe Saldaña', 'Sigourney Weaver'],
@@ -67,8 +73,9 @@ final List<Film> filmsData = [
   ),
   const Film(
     title: 'Shawshank Redemption',
+    trailerUrl: 'https://www.youtube.com/watch?v=6hB3S9bIaco',
+    movieUrl: 'https://kinogo.biz',
     category: 'Դրամա • 1994',
-    rating: '8.8',
     description:
         'Չգործած հանցանքի համար ցմահ բանտարկության դատապարտված Էնդին ամուր ընկերություն է հաստատում բանտակից Ռեդի հետ։',
     cast: ['Tim Robbins', 'Morgan Freeman', 'Bob Gunton'],
@@ -78,8 +85,9 @@ final List<Film> filmsData = [
   ),
   const Film(
     title: 'Forrest Gump',
+    trailerUrl: 'https://www.youtube.com/watch?v=bLvqoHBptjg',
+    movieUrl: 'https://kinogo.biz',
     category: 'Դրամա • 1994',
-    rating: '9.2',
     description:
         'Բարի ու հասարակ մի մարդ պատմում է զարմանալի իրադարձությունների մասին, որոնք նրան ուղեկցել են ամերիկյան պատմության տասնամյակների ընթացքում։',
     cast: ['Tom Hanks', 'Robin Wright', 'Gary Sinise'],
@@ -89,8 +97,9 @@ final List<Film> filmsData = [
   ),
   const Film(
     title: 'The Godfather',
+    trailerUrl: 'https://www.youtube.com/watch?v=sY1S34973zA',
+    movieUrl: 'https://kinogo.biz',
     category: 'Դրամա • 1972',
-    rating: '8.8',
     description:
         'Հզոր հանցավոր ընտանիքի ծերացող ղեկավարը փորձում է իշխանությունը փոխանցել իր դժկամ որդուն՝ Մայքլին։',
     cast: ['Marlon Brando', 'Al Pacino', 'James Caan'],
@@ -100,10 +109,11 @@ final List<Film> filmsData = [
   ),
   const Film(
     title: 'Fight Club',
+    trailerUrl: 'https://www.youtube.com/watch?v=BdJKm16Co6M',
+    movieUrl: 'https://kinogo.biz',
     category: 'Դրամա • 1999',
-    rating: '8.4',
     description:
-        'Անքնությամբ տառապող գրասենյակային աշխատողն ու խորհրդավոր օճառագործը ստեղծում են ընդհատակյա մարտական ակումբ, որն աճում է նրանց վերահսկողությունից դուրս։',
+        'Անքնությամբ տառապող գրասենյակային աշխատողն ու խորհրդավոր օճառագործը ստեղծում են ընդհատակյя մարտական ակումբ, որն աճում է նրանց վերահսկողությունից դուրս։',
     cast: ['Brad Pitt', 'Edward Norton', 'Helena Bonham Carter'],
     image:
         'https://m.media-amazon.com/images/M/MV5BOTgyOGQ1NDItNGU3Ny00MjU3LTg2YWEtNmEyYjBiMjI1Y2M5XkEyXkFqcGc@._V1_.jpg',
@@ -111,8 +121,9 @@ final List<Film> filmsData = [
   ),
   const Film(
     title: 'Joker',
+    trailerUrl: 'https://www.youtube.com/watch?v=zAGVQLHvwOY',
+    movieUrl: 'https://kinogo.biz',
     category: 'Թրիլեր • 2019',
-    rating: '8.6',
     description:
         'Գոթեմում դժվարություններ ունեցող կատակերգուին հասարակության թշնամանքը մղում է դեպի բռնի կերպարանափոխություն։',
     cast: ['Joaquin Phoenix', 'Robert De Niro', 'Zazie Beetz'],
@@ -122,8 +133,9 @@ final List<Film> filmsData = [
   ),
   const Film(
     title: 'Se7en',
+    trailerUrl: 'https://www.youtube.com/watch?v=znmZoKVULTE',
+    movieUrl: 'https://kinogo.biz',
     category: 'Թրիլեր • 1995',
-    rating: '8.4',
     description:
         'Երկու հետախույզ հետապնդում են սերիական մարդասպանի, որի հանցագործությունները ներշնչված են յոթ մահացու մեղքերից։',
     cast: ['Brad Pitt', 'Morgan Freeman', 'Gwyneth Paltrow'],
@@ -133,10 +145,11 @@ final List<Film> filmsData = [
   ),
   const Film(
     title: 'The Silence of the Lambs',
+    trailerUrl: 'https://www.youtube.com/watch?v=W6Mm8Sbe__o',
+    movieUrl: 'https://kinogo.biz',
     category: 'Թրիլեր • 1991',
-    rating: '8.6',
     description:
-        'Հետաքննությունների դաշնային բյուրոյի նորեկը դիմում է բանտարկված հոգեբույժ Հանիբալ Լեքթերի օգնությանը՝ մեկ այլ վտանգավոր մարդասպանի բռնելու համար։',
+        'Հետաքննությունների դաշնային բյուրոյի նորեկը դիմում է բանտարկված հոգեբույժ Հանիբալ Լեքթերի օգнությանը՝ մեկ այլ վտանգավոր մարդասպանի բռնելու համար։',
     cast: ['Jodie Foster', 'Anthony Hopkins', 'Scott Glenn'],
     image:
         'https://m.media-amazon.com/images/M/MV5BNDdhOGJhYzctYzYwZC00YmI2LWI0MjctYjg4ODdlMDExYjBlXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg',
@@ -144,8 +157,9 @@ final List<Film> filmsData = [
   ),
   const Film(
     title: 'Spirited Away',
+    trailerUrl: 'https://www.youtube.com/watch?v=ByXuk9QqQkk',
+    movieUrl: 'https://kinogo.biz',
     category: 'Անիմացիա • 2001',
-    rating: '8.6',
     description:
         'Երբ նրա ծնողները կերպարանափոխվում են, մի աղջիկ հայտնվում է հոգիների աշխարհում և փորձում գտնել տուն վերադառնալու ճանապարհը։',
     cast: ['Rumi Hiiragi', 'Miyu Irino', 'Mari Natsuki'],
@@ -155,8 +169,9 @@ final List<Film> filmsData = [
   ),
   const Film(
     title: 'Coco',
+    trailerUrl: 'https://www.youtube.com/watch?v=Rvr68u6k5sI',
+    movieUrl: 'https://kinogo.biz',
     category: 'Անիմացիա • 2017',
-    rating: '8.4',
     description:
         'Երաժիշտ դառնալու ձգտող Միգելը մեկնում է Մեռյալների աշխարհ և բացահայտում իր ընտանիքի անցյալի ճշմարտությունը։',
     cast: ['Anthony Gonzalez', 'Gael García Bernal', 'Benjamin Bratt'],
@@ -166,8 +181,9 @@ final List<Film> filmsData = [
   ),
   const Film(
     title: 'Spider-Man: Into the Spider-Verse',
+    trailerUrl: 'https://www.youtube.com/watch?v=g4Hbz2jLxvQ',
+    movieUrl: 'https://kinogo.biz',
     category: 'Անիմացիա • 2018',
-    rating: '9.3',
     description:
         'Բրուքլինցի դեռահաս Մայլս Մորալեսը բացահայտում է իր ուժերն ու հանդիպում սարդ-հերոսների՝ բազմատիեզերքի տարբեր աշխարհներից։',
     cast: ['Shameik Moore', 'Jake Johnson', 'Hailee Steinfeld'],
@@ -177,88 +193,13 @@ final List<Film> filmsData = [
   ),
   const Film(
     title: 'Up',
+    trailerUrl: 'https://www.youtube.com/watch?v=ORFWdXl_zJ4',
+    movieUrl: 'https://kinogo.biz',
     category: 'Անիմացիա • 2009',
-    rating: '4.9',
     description:
         'Այրիացած տղամարդը փուչիկներով իր տունը բարձրացնում է երկինք և երիտասարդ սկաուտի հետ մեկնում անսպասելի արկածի։',
-    cast: ['Ed Asner', 'Jordan Nagai', 'Christopher Plummer'],
-    image:
-        'https://m.media-amazon.com/images/M/MV5BNmI1ZTc5MWMtMDYyOS00ZDc2LTkzOTAtNjQ4NWIxNjYyNDgzXkEyXkFqcGc@._V1_.jpg',
-    color: Color(0xFF0D47A1),
-  ),
-  const Film(
-    title: 'Gladiator',
-    category: 'Դրամա • 2000',
-    rating: '8.5',
-    description:
-        'Հռոմեացի զորավարը դավաճանության հետևանքով ստրկացվում է, ապա մարտերով վերադառնում՝ կայսրից արդարություն պահանջելու։',
-    cast: ['Russell Crowe', 'Joaquin Phoenix', 'Connie Nielsen'],
-    image:
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQpZ46jZKZ3eHlHmvVTD0ZmNDbtDftq3A_KimQXeLccKBa5XNDrYbgxL9I&s=10',
-    color: Color(0xFF4E342E),
-  ),
-  const Film(
-    title: 'The Dark Knight',
-    category: 'Թրիլեր • 2008',
-    rating: '9.0',
-    description:
-        'Բեթմենը դիմակայում է Ջոքերին՝ հանցավոր հանճարին, որի քաոսային գործողությունները փորձության են ենթարկում Գոթեմն ու նրա բնակիչներին։',
-    cast: ['Christian Bale', 'Heath Ledger', 'Aaron Eckhart'],
-    image:
-        'https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_FMjpg_UX1000_.jpg',
-    color: Color(0xFF111827),
-  ),
-  const Film(
-    title: 'Blade Runner 2049',
-    category: 'Գիտաֆանտաստիկ • 2017',
-    rating: '8.0',
-    description:
-        'Ռեպլիկանտ հետախույզը բացահայտում է մի գաղտնիք, որը կարող է փոխել հասարակությունը, և գտնում տարիներ առաջ անհետացած նախկին բլեյդ ռաններին։',
-    cast: ['Ryan Gosling', 'Harrison Ford', 'Ana de Armas'],
-    image: 'https://m.media-amazon.com/images/I/51+X5SWwQzL.jpg',
-    color: Color(0xFF1E1B4B),
-  ),
-  const Film(
-    title: 'Oppenheimer',
-    category: 'Դրամա • 2023',
-    rating: '8.9',
-    description:
-        'Երկրորդ համաշխարհային պատերազմի տարիներին ֆիզիկոս Ջ. Ռոբերտ Օպենհայմերն ու նրա գործընկերները մրցում են առաջին ատոմային ռումբը ստեղծելու համար։',
-    cast: ['Cillian Murphy', 'Emily Blunt', 'Robert Downey Jr.'],
-    image:
-        'https://www.tallengestore.com/cdn/shop/files/Oppenheimer-CillianMurphy-ChristopherNolan-HollywoodMoviePoster_large.jpg?v=1690724731',
-    color: Color(0xFF78350F),
-  ),
-  const Film(
-    title: 'Dune: Part Two',
-    category: 'Գիտաֆանտաստիկ • 2024',
-    rating: '8.8',
-    description:
-        'Արրաքիսի անապատային մոլորակում Փոլ Ատրեյդեսը միանում է ֆրեմեններին և կանգնում ճակատագրի առաջ, որը կարող է փոխել տիեզերքը։',
-    cast: ['Timothée Chalamet', 'Zendaya', 'Rebecca Ferguson'],
-    image: 'https://m.media-amazon.com/images/I/814JFecL3AL.jpg',
-    color: Color(0xFF92400E),
-  ),
-  const Film(
-    title: 'The Lord of the Rings',
-    category: 'Ֆանտաստիկա • 2001',
-    rating: '9.0',
-    description:
-        'Հոբիթն ու նրա ուղեկիցները մեկնում են վտանգավոր ճանապարհորդության՝ ոչնչացնելու մատանին, որը տիրոջը կարող է անսահման իշխանություն տալ։',
-    cast: ['Elijah Wood', 'Ian McKellen', 'Viggo Mortensen'],
-    image:
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCYYMYY93q-FBxhRLppXG8tq4Bb0JYm0a-ADabs69n8K7m6-_E_VD0Dp8&s=10',
-    color: Color(0xFF3B82F6),
-  ),
-  const Film(
-    title: 'Titanic',
-    category: 'Դրամա • 1997',
-    rating: '7.9',
-    description:
-        'Տարբեր աշխարհներից երկու երիտասարդ ուղևորներ սիրահարվում են «Տիտանիկ» նավի առաջին նավարկության ընթացքում։',
-    cast: ['Leonardo DiCaprio', 'Kate Winslet', 'Billy Zane'],
-    image:
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_75mz-U_nJAB1xXq6LgxkFzE0Hl11OWLjfzGx0cW3dg&s',
-    color: Color(0xFF0284C7),
+    cast: ['Edward Asner', 'Jordan Nagai', 'John Ratzenberger'],
+    image: 'https://media-amazon.com',
+    color: Color(0xFF0288D1),
   ),
 ];

@@ -1,52 +1,80 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
-
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import '../for_listview/images_and_info.dart';
 
-class FilmsVideos extends StatelessWidget {
-  const FilmsVideos({super.key, required this.film});
+class FilmsVideos extends StatefulWidget {
+  const FilmsVideos({
+    super.key,
+    required this.film,
+    required this.isFavorite,
+    required this.onFavoriteChanged,
+  });
 
   final Film film;
+  final bool isFavorite;
+  final ValueChanged<bool> onFavoriteChanged;
 
-  Future<void> _openTrailer(BuildContext context) async {
-    final title = film.title;
-    final trailerUri = Uri.https('www.youtube.com', '/results', {
-      'search_query': '$title official trailer',
-    });
-    final didLaunch = await launchUrl(
-      trailerUri,
-      mode: LaunchMode.externalApplication,
-    );
+  @override
+  State<FilmsVideos> createState() => _FilmsVideosState();
+}
 
-    if (!didLaunch && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Չհաջողվեց բացել թրեյլերը։')),
-      );
-    }
+class _FilmsVideosState extends State<FilmsVideos> {
+  late bool _isFavorite;
+
+  @override
+  void initState() {
+    super.initState();
+    _isFavorite = widget.isFavorite;
   }
 
-  Future<void> _openMovie(BuildContext context) async {
-    final title = film.title;
-    final filmUri = Uri.https('kinogo.ec', '/results', {
-      'search_query': '$title official movie',
-    });
-    final didLaunch = await launchUrl(
-      filmUri,
-      mode: LaunchMode.externalApplication,
-    );
+  void _playVideo(BuildContext context, {required bool isTrailer}) {
+    final videoUrl = isTrailer ? widget.film.trailerUrl : widget.film.movieUrl;
+    final videoId = isTrailer && videoUrl != null
+        ? YoutubePlayer.convertUrlToId(videoUrl)
+        : null;
+    final uri = videoUrl == null ? null : Uri.tryParse(videoUrl);
 
-    if (!didLaunch && context.mounted) {
+    if (videoUrl == null ||
+        (isTrailer && videoId == null) ||
+        (!isTrailer &&
+            (uri == null || uri.scheme != 'https' || uri.host.isEmpty))) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Չհաջողվեց բացել ֆիլմը։')),
+        SnackBar(
+          content: Text(
+            isTrailer
+                ? 'Այս ֆիլմի թրեյլերի հղումը հասանելի կամ վավեր չէ։'
+                : 'Այս ֆիլմի դիտման համար վավեր HTTPS հղում հասանելի չէ։',
+          ),
+        ),
       );
+      return;
     }
+
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => _FilmPlayerPage(
+          title: widget.film.title,
+          isTrailer: isTrailer,
+          videoUrl: videoUrl,
+          videoId: videoId,
+        ),
+      ),
+    );
+  }
+
+  void _toggleFavorite() {
+    setState(() {
+      _isFavorite = !_isFavorite;
+    });
+    widget.onFavoriteChanged(_isFavorite);
   }
 
   @override
   Widget build(BuildContext context) {
+    final film = widget.film;
     final title = film.title;
     final category = film.category;
-    final rating = film.rating;
     final description = film.description;
     final cast = film.cast;
     final imageUrl = film.image;
@@ -64,7 +92,7 @@ class FilmsVideos extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             GestureDetector(
-              onTap: () => _openTrailer(context),
+              onTap: () => _playVideo(context, isTrailer: true),
               child: SizedBox(
                 width: double.infinity,
                 height: 320,
@@ -107,22 +135,6 @@ class FilmsVideos extends StatelessWidget {
                         category,
                         style: const TextStyle(color: Colors.white70),
                       ),
-                      if (rating.isNotEmpty)
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.star,
-                              color: Colors.amber,
-                              size: 18,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              rating,
-                              style: const TextStyle(color: Colors.white70),
-                            ),
-                          ],
-                        ),
                     ],
                   ),
                   const SizedBox(height: 24),
@@ -185,39 +197,177 @@ class FilmsVideos extends StatelessWidget {
                       ),
                     ),
                   const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton.icon(
-                      onPressed: () => _openMovie(context),
-                      icon: const Icon(Icons.play_arrow),
-                      label: Text('Դիտել «$title» ֆիլմը'),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: const Color(0xFF7C3AED),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: FilledButton(
+                          onPressed: _toggleFavorite,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: const Color(0xFF7C3AED),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(_isFavorite ? Icons.check : Icons.add),
+                              const SizedBox(width: 4),
+                              Flexible(
+                                child: Text(
+                                  _isFavorite ? 'Ցուցակում է' : '+ Ցուցակ',
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton.icon(
-                      onPressed: () {},
-                      label: const Text('+ Ցուցակ'),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 47, 34, 70),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: FilledButton(
+                          onPressed: () =>
+                              _playVideo(context, isTrailer: false),
+                          style: FilledButton.styleFrom(
+                            backgroundColor:
+                                const Color.fromARGB(255, 47, 34, 70),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                          child: const Text('Դիտել'),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ],
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _FilmPlayerPage extends StatefulWidget {
+  final String title;
+  final bool isTrailer;
+  final String videoUrl;
+  final String? videoId;
+
+  const _FilmPlayerPage({
+    required this.title,
+    required this.isTrailer,
+    required this.videoUrl,
+    required this.videoId,
+  });
+
+  @override
+  State<_FilmPlayerPage> createState() => _FilmPlayerPageState();
+}
+
+class _FilmPlayerPageState extends State<_FilmPlayerPage> {
+  late final YoutubePlayerController? _youtubeController;
+  late final WebViewController? _webViewController;
+  int _pageProgress = 0;
+  String? _webViewError;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.isTrailer) {
+      _youtubeController = YoutubePlayerController(
+        initialVideoId: widget.videoId!,
+        flags: const YoutubePlayerFlags(autoPlay: true, mute: false),
+      );
+      _webViewController = null;
+    } else {
+      _youtubeController = null;
+      _webViewController = WebViewController()
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..setNavigationDelegate(
+          NavigationDelegate(
+            onPageStarted: (_) {
+              if (!mounted) return;
+              setState(() {
+                _pageProgress = 0;
+                _webViewError = null;
+              });
+            },
+            onProgress: (progress) {
+              if (!mounted) return;
+              setState(() => _pageProgress = progress);
+            },
+            onPageFinished: (_) {
+              if (!mounted) return;
+              setState(() => _pageProgress = 100);
+            },
+            onWebResourceError: (error) {
+              if (!mounted || error.isForMainFrame != true) return;
+              setState(() {
+                _webViewError = error.description;
+                _pageProgress = 100;
+              });
+            },
+          ),
+        )
+        ..loadRequest(Uri.parse(widget.videoUrl));
+    }
+  }
+
+  @override
+  void dispose() {
+    _youtubeController?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final title = widget.isTrailer ? '${widget.title} - Trailer' : widget.title;
+
+    if (!widget.isTrailer) {
+      return Scaffold(
+        backgroundColor: const Color(0xFF0F172A),
+        appBar: AppBar(
+          backgroundColor: const Color(0xFF0F172A),
+          foregroundColor: Colors.white,
+          title: Text(title),
+        ),
+        body: Stack(
+          children: [
+            WebViewWidget(controller: _webViewController!),
+            if (_pageProgress < 100)
+              LinearProgressIndicator(value: _pageProgress / 100),
+            if (_webViewError != null)
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Text(
+                    'Չհաջողվեց բացել էջը։ $_webViewError',
+                    style: const TextStyle(color: Colors.white),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      );
+    }
+
+    return YoutubePlayerBuilder(
+      player: YoutubePlayer(
+        controller: _youtubeController!,
+        showVideoProgressIndicator: true,
+      ),
+      builder: (context, player) => Scaffold(
+        backgroundColor: const Color(0xFF0F172A),
+        appBar: AppBar(
+          backgroundColor: const Color(0xFF0F172A),
+          foregroundColor: Colors.white,
+          title: Text(title),
+        ),
+        body: Center(child: player),
       ),
     );
   }
