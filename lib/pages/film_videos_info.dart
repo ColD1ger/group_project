@@ -9,11 +9,15 @@ class FilmsVideos extends StatefulWidget {
     required this.film,
     required this.isFavorite,
     required this.onFavoriteChanged,
+    required this.isWatched,
+    required this.onWatchedChanged,
   });
 
   final Film film;
   final bool isFavorite;
   final ValueChanged<bool> onFavoriteChanged;
+  final bool isWatched;
+  final ValueChanged<bool> onWatchedChanged;
 
   @override
   State<FilmsVideos> createState() => _FilmsVideosState();
@@ -21,11 +25,13 @@ class FilmsVideos extends StatefulWidget {
 
 class _FilmsVideosState extends State<FilmsVideos> {
   late bool _isFavorite;
+  late bool _isWatched;
 
   @override
   void initState() {
     super.initState();
     _isFavorite = widget.isFavorite;
+    _isWatched = widget.isWatched;
   }
 
   void _playVideo(BuildContext context, {required bool isTrailer}) {
@@ -51,6 +57,13 @@ class _FilmsVideosState extends State<FilmsVideos> {
       return;
     }
 
+    if (!isTrailer) {
+      _markAsWatched();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Այս ֆիլմի համար դիտման էջը բացվում է։')),
+      );
+    }
+
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => _FilmPlayerPage(
@@ -68,6 +81,14 @@ class _FilmsVideosState extends State<FilmsVideos> {
       _isFavorite = !_isFavorite;
     });
     widget.onFavoriteChanged(_isFavorite);
+  }
+
+  void _markAsWatched() {
+    if (_isWatched) return;
+    setState(() {
+      _isWatched = true;
+    });
+    widget.onWatchedChanged(true);
   }
 
   @override
@@ -227,15 +248,16 @@ class _FilmsVideosState extends State<FilmsVideos> {
                       const SizedBox(width: 10),
                       Expanded(
                         child: FilledButton(
-                          onPressed: () =>
-                              _playVideo(context, isTrailer: false),
+                          onPressed: () {
+                            _playVideo(context, isTrailer: false);
+                          },
                           style: FilledButton.styleFrom(
                             backgroundColor:
                                 const Color.fromARGB(255, 47, 34, 70),
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          child: const Text('Դիտել'),
+                          child: Text(_isWatched ? 'Դիտված է' : 'Դիտել ֆիլմը'),
                         ),
                       ),
                     ],
@@ -269,7 +291,7 @@ class _FilmPlayerPage extends StatefulWidget {
 
 class _FilmPlayerPageState extends State<_FilmPlayerPage> {
   late final YoutubePlayerController? _youtubeController;
-  late final WebViewController? _webViewController;
+  WebViewController? _webViewController;
   int _pageProgress = 0;
   String? _webViewError;
 
@@ -281,39 +303,42 @@ class _FilmPlayerPageState extends State<_FilmPlayerPage> {
         initialVideoId: widget.videoId!,
         flags: const YoutubePlayerFlags(autoPlay: true, mute: false),
       );
-      _webViewController = null;
     } else {
       _youtubeController = null;
-      _webViewController = WebViewController()
-        ..setJavaScriptMode(JavaScriptMode.unrestricted)
-        ..setNavigationDelegate(
-          NavigationDelegate(
-            onPageStarted: (_) {
-              if (!mounted) return;
-              setState(() {
-                _pageProgress = 0;
-                _webViewError = null;
-              });
-            },
-            onProgress: (progress) {
-              if (!mounted) return;
-              setState(() => _pageProgress = progress);
-            },
-            onPageFinished: (_) {
-              if (!mounted) return;
-              setState(() => _pageProgress = 100);
-            },
-            onWebResourceError: (error) {
-              if (!mounted || error.isForMainFrame != true) return;
-              setState(() {
-                _webViewError = error.description;
-                _pageProgress = 100;
-              });
-            },
-          ),
-        )
-        ..loadRequest(Uri.parse(widget.videoUrl));
     }
+  }
+
+  void _openMoviePage() {
+    final controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onPageStarted: (_) {
+            if (!mounted) return;
+            setState(() {
+              _pageProgress = 0;
+              _webViewError = null;
+            });
+          },
+          onProgress: (progress) {
+            if (!mounted) return;
+            setState(() => _pageProgress = progress);
+          },
+          onPageFinished: (_) {
+            if (!mounted) return;
+            setState(() => _pageProgress = 100);
+          },
+          onWebResourceError: (error) {
+            if (!mounted || error.isForMainFrame != true) return;
+            setState(() {
+              _webViewError = error.description;
+              _pageProgress = 100;
+            });
+          },
+        ),
+      );
+    setState(() => _webViewController = controller);
+    controller.loadRequest(Uri.parse(widget.videoUrl));
   }
 
   @override
@@ -336,7 +361,16 @@ class _FilmPlayerPageState extends State<_FilmPlayerPage> {
         ),
         body: Stack(
           children: [
-            WebViewWidget(controller: _webViewController!),
+            if (_webViewController == null)
+              Center(
+                child: FilledButton.icon(
+                  onPressed: _openMoviePage,
+                  icon: const Icon(Icons.play_arrow),
+                  label: const Text('Բացել ֆիլմի դիտման էջը'),
+                ),
+              )
+            else
+              WebViewWidget(controller: _webViewController!),
             if (_pageProgress < 100)
               LinearProgressIndicator(value: _pageProgress / 100),
             if (_webViewError != null)

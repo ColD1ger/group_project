@@ -20,6 +20,8 @@ class Film {
   final String? trailerUrl;
   final String? movieUrl;
   final Color color;
+
+  String get id => title;
 }
 
 final List<Film> filmsData = [

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'film_videos_info.dart';
 import '../for_listview/images_and_info.dart';
+import '../movie_provider.dart';
 import 'profile.dart';
 
 class MainPage extends StatefulWidget {
@@ -15,8 +17,7 @@ class _MainPageState extends State<MainPage> {
   String searchQuery = '';
   bool showFavoritesOnly = false;
   int selectedNavIndex = 0;
-
-  final Set<String> favoriteFilms = {};
+  int favoriteFilter = 0;
 
   final List<String> categories = [
     'Բոլորը',
@@ -29,15 +30,23 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    final movieProvider = Provider.of<MovieProvider>(context);
     final filteredFilms = filmsData.where((film) {
       final matchesCategory = selectedCategory == 'Բոլորը' ||
           film.category.contains(selectedCategory);
       final matchesSearch =
           film.title.toLowerCase().contains(searchQuery.toLowerCase());
       final matchesFavorites =
-          !showFavoritesOnly || favoriteFilms.contains(film.title);
+          !showFavoritesOnly || movieProvider.isFavorite(film.id);
+      final matchesWatchStatus = !showFavoritesOnly ||
+          favoriteFilter == 0 ||
+          (favoriteFilter == 1 && !movieProvider.isWatched(film.id)) ||
+          (favoriteFilter == 2 && movieProvider.isWatched(film.id));
 
-      return matchesCategory && matchesSearch && matchesFavorites;
+      return matchesCategory &&
+          matchesSearch &&
+          matchesFavorites &&
+          matchesWatchStatus;
     }).toList();
 
     return Scaffold(
@@ -110,6 +119,27 @@ class _MainPageState extends State<MainPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  if (showFavoritesOnly)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Wrap(
+                        spacing: 8,
+                        children: [
+                          for (var index = 0; index < 3; index++)
+                            ChoiceChip(
+                              label: Text(
+                                ['Բոլորը', 'Չդիտված', 'Դիտված'][index],
+                              ),
+                              selected: favoriteFilter == index,
+                              onSelected: (_) {
+                                setState(() {
+                                  favoriteFilter = index;
+                                });
+                              },
+                            ),
+                        ],
+                      ),
+                    ),
                   TextField(
                     onChanged: (value) {
                       setState(() {
@@ -210,7 +240,7 @@ class _MainPageState extends State<MainPage> {
                             itemBuilder: (context, index) {
                               final movie = filteredFilms[index];
                               final isLiked =
-                                  favoriteFilms.contains(movie.title);
+                                  movieProvider.isFavorite(movie.id);
 
                               return GestureDetector(
                                 onTap: () {
@@ -219,15 +249,14 @@ class _MainPageState extends State<MainPage> {
                                       builder: (_) => FilmsVideos(
                                         film: movie,
                                         isFavorite: isLiked,
+                                        isWatched:
+                                            movieProvider.isWatched(movie.id),
                                         onFavoriteChanged: (isFavorite) {
-                                          setState(() {
-                                            if (isFavorite) {
-                                              favoriteFilms.add(movie.title);
-                                            } else {
-                                              favoriteFilms.remove(movie.title);
-                                            }
-                                          });
+                                          movieProvider
+                                              .toggleFavorite(movie.id);
                                         },
+                                        onWatchedChanged: (_) => movieProvider
+                                            .markAsWatched(movie.id),
                                       ),
                                     ),
                                   );
@@ -285,15 +314,9 @@ class _MainPageState extends State<MainPage> {
                                                 right: 8,
                                                 child: GestureDetector(
                                                   onTap: () {
-                                                    setState(() {
-                                                      if (isLiked) {
-                                                        favoriteFilms.remove(
-                                                            movie.title);
-                                                      } else {
-                                                        favoriteFilms
-                                                            .add(movie.title);
-                                                      }
-                                                    });
+                                                    movieProvider
+                                                        .toggleFavorite(
+                                                            movie.id);
                                                   },
                                                   child: Container(
                                                     padding:
